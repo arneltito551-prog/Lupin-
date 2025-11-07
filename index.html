@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    <link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Materials Request — Firestore + Cloudinary</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- App Bar -->
+    <header class="appbar">
+      <button id="hamburger" class="icon-btn" aria-label="menu">☰</button>
+      <div class="title">Materials Request</div>
+      <div class="search-wrap">
+        <button id="searchBtn" class="icon-btn" aria-label="search">🔍</button>
+      </div>
+    </header>
+
+    <!-- Drawer -->
+    <aside id="drawer" class="drawer">
+      <div class="drawer-header">
+        <strong>Menu</strong>
+        <button id="closeDrawer" class="icon-btn" aria-label="close">✕</button>
+      </div>
+      <nav class="drawer-nav">
+        <a href="#" data-section="home" class="drawer-item">Home</a>
+        <a href="#" data-section="submit" class="drawer-item">Submit Request</a>
+        <a href="#" data-section="view" class="drawer-item">View Requests</a>
+        <a href="#" data-section="delivered" class="drawer-item">Delivered Items</a>
+        <a href="#" data-section="remaining" class="drawer-item">Remaining Items</a>
+        <a href="#" data-section="usage" class="drawer-item">Usage / Reports</a>
+        <hr>
+        <a href="#" id="clearAll" class="drawer-item warn">Clear All Requests (cloud)</a>
+      </nav>
+    </aside>
+
+    <!-- Search Overlay -->
+    <div id="searchOverlay" class="search-overlay hidden" aria-hidden="true">
+      <div class="search-card">
+        <div class="search-head">
+          <input id="searchInput" placeholder="Search material or requester..." />
+          <button id="closeSearch" class="icon-btn" aria-label="close">✕</button>
+        </div>
+        <div id="searchResults" class="search-results"></div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <main class="content">
+
+      <!-- Home -->
+      <section id="home" class="screen active">
+        <div class="card">
+          <h2>Welcome</h2>
+          <p>All data syncs to Firestore (<code>crrd-895af</code>) and images go to Cloudinary. Visible on any device.</p>
+          <div id="homeStats" class="home-stats"></div>
+          <div id="onlineStatus" style="margin-top:8px;font-size:13px;color:var(--muted)"></div>
+        </div>
+      </section>
+
+      <!-- Submit -->
+      <section id="submit" class="screen">
+        <div class="card">
+          <h2>Submit Request</h2>
+          <form id="requestForm" class="form" enctype="multipart/form-data">
+            <label>Material Name
+              <input id="title" name="title" type="text" required placeholder="e.g., Cement" />
+            </label>
+
+            <label>Quantity
+              <input id="quantity" name="quantity" type="number" min="1" value="1" required />
+            </label>
+
+            <label>Unit
+              <input id="unit" name="unit" type="text" required placeholder="e.g., pcs, bags" />
+            </label>
+
+            <label>Requester
+              <select id="requester" name="requester" required>
+                <option value="" disabled selected>Select personnel</option>
+                <option>Arnel Tito</option>
+                <option>Jessie Yamid</option>
+                <option>Roger Castillo</option>
+                <option>Roberto Oraiz</option>
+                <option>Ricky Saragena</option>
+                <option>Aljay Albit</option>
+              </select>
+            </label>
+
+            <label>Description
+              <textarea id="description" name="description" rows="3" placeholder="Optional"></textarea>
+            </label>
+
+            <label>Attach Image (optional)
+              <input id="materialImage" name="materialImage" type="file" accept="image/*" />
+            </label>
+
+            <div class="form-row">
+              <button type="submit" class="btn primary">Submit</button>
+              <button type="reset" class="btn">Reset</button>
+            </div>
+
+            <p class="note">Note: Remaining starts at <strong>0</strong> — deliveries add stock. Offline writes queued and synced when online.</p>
+          </form>
+        </div>
+      </section>
+
+      <!-- View Requests -->
+      <section id="view" class="screen">
+        <div class="card">
+          <h2>View Requests</h2>
+          <div id="requestsList" class="list"></div>
+        </div>
+      </section>
+
+      <!-- Delivered -->
+      <section id="delivered" class="screen">
+        <div class="card">
+          <h2>Delivered Items</h2>
+          <div id="deliveredList" class="list"></div>
+        </div>
+      </section>
+
+      <!-- Remaining -->
+      <section id="remaining" class="screen">
+        <div class="card">
+          <h2>Remaining Items</h2>
+          <div id="remainingList" class="list"></div>
+        </div>
+      </section>
+
+      <!-- Usage / Reports -->
+      <section id="usage" class="screen">
+        <div class="card">
+          <h2>Usage & Reports</h2>
+          <div id="usageSummary"></div>
+          <div class="form-row" style="margin-top:12px;">
+            <button id="exportCsv" class="btn">Export CSV</button>
+            <button id="printAll" class="btn primary">Print All (A→Z)</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FAB -->
+    <button id="fab" class="fab" title="New Request">＋</button>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-section="home">🏠<span>Home</span></button>
+      <button class="nav-item" data-section="view">📋<span>Requests</span></button>
+      <button class="nav-item" data-section="delivered">🚚<span>Delivered</span></button>
+      <button class="nav-item" data-section="remaining">📦<span>Remaining</span></button>
+      <button class="nav-item" data-section="usage">📊<span>Usage</span></button>
+    </nav>
+
+  </div>
+
+  <!-- Toast container -->
+  <div id="toastContainer"></div>
+
+  <!-- Edit modal -->
+  <div id="editModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="editTitle">Edit Request</h3>
+        <button id="closeEdit" class="icon-btn" aria-label="close">✕</button>
+      </div>
+      <div class="modal-body" id="editBody"></div>
+      <div class="modal-actions">
+        <button id="saveEdit" class="btn primary">Save</button>
+        <button id="cancelEdit" class="btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
+    <script type="module" src="./script.js"></script>
+
+  </body>
+  
+</html>
